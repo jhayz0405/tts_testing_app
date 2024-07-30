@@ -125,7 +125,7 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
             Text("Precision: $precision"),
             Text("Recall: $recall"),
             Text("F1 Score: $f1Score"),
-            Text("Error Score: $errorRate"),
+            Text("Error Rate: $errorRate"),
             SizedBox(height: 20),
             Expanded(
               child: BarChart(
