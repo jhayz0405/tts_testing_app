@@ -41,6 +41,10 @@ dependencies:
   leopard_flutter: ^2.0.2
   flutter_ffmpeg: ^0.4.2
   number_to_words: ^1.0.0
+  device_info_plus: ^10.1.0
+  flutter_local_notifications: ^17.2.1+2
+  flutter_timezone: ^2.1.0
+  image: ^4.2.0
 
 dev_dependencies:
   flutter_test:
