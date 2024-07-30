@@ -17,6 +17,7 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
   double precision = 0.0;
   double recall = 0.0;
   double f1Score = 0.0;
+  double errorRate = 0.0;
   late LeopardService leopardService;
 
   @override
@@ -53,10 +54,37 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
     int totalInputCharacters = input.length;
     int totalTranscribedCharacters = transcribed.length;
 
-    for (int i = 0; i < totalInputCharacters && i < totalTranscribedCharacters; i++) {
+    // True Positives (TP): Characters in the input text that are correctly transcribed.
+    // False Positives (FP): Characters in the transcription that are not in the input text.
+    // False Negatives (FN): Characters in the input text that are missing from the transcription.
+    // True Negatives (TN): Not used here, as it does not apply to character-level evaluations.
+    int falsePositives = 0;
+    int falseNegatives = 0;
+    int truePositives = 0;
+    int trueNegatives = 0;
+
+    for (int i = 0;
+        i < totalInputCharacters && i < totalTranscribedCharacters;
+        i++) {
       if (input[i] == transcribed[i]) {
         correctCharacters++;
       }
+    }
+
+    for (int i = 0; i < totalInputCharacters; i++) {
+      if (i < totalTranscribedCharacters) {
+        if (input[i] == transcribed[i]) {
+          truePositives++;
+        } else {
+          falsePositives++;
+        }
+      } else {
+        falseNegatives++;
+      }
+    }
+
+    for (int i = totalInputCharacters; i < totalTranscribedCharacters; i++) {
+      falsePositives++;
     }
 
     setState(() {
@@ -64,6 +92,11 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
       precision = correctCharacters / totalTranscribedCharacters;
       recall = correctCharacters / totalInputCharacters;
       f1Score = 2 * (precision * recall) / (precision + recall);
+
+      double total = truePositives.toDouble() +
+          falsePositives.toDouble() +
+          falseNegatives.toDouble();
+      errorRate = (falsePositives + falseNegatives) / total;
     });
   }
 
@@ -85,11 +118,14 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
               onPressed: evaluateTTS,
               child: Text("Evaluate TTS"),
             ),
+            SizedBox(height: 35),
             Text("Transcribed Text: $transcribedText"),
+            SizedBox(height: 30),
             Text("Accuracy: $accuracy"),
             Text("Precision: $precision"),
             Text("Recall: $recall"),
             Text("F1 Score: $f1Score"),
+            Text("Error Rate: $errorRate"),
             SizedBox(height: 20),
             Expanded(
               child: BarChart(
@@ -125,6 +161,13 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
                       ],
                       // showingTooltipIndicators: [0],
                     ),
+                    BarChartGroupData(
+                      x: 4,
+                      barRods: [
+                        BarChartRodData(toY: errorRate  , color: Colors.purple)
+                      ],
+                      // showingTooltipIndicators: [0],
+                    ),
                   ],
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
@@ -133,13 +176,20 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
                         getTitlesWidget: (value, meta) {
                           switch (value.toInt()) {
                             case 0:
-                              return Text('Accuracy\n${(accuracy * 100).toStringAsFixed(1)}%');
+                              return Text(
+                                  'Accuracy\n${(accuracy * 100).toStringAsFixed(1)}%');
                             case 1:
-                              return Text('Precision\n${(precision * 100).toStringAsFixed(1)}%');
+                              return Text(
+                                  'Precision\n${(precision * 100).toStringAsFixed(1)}%');
                             case 2:
-                              return Text('Recall\n${(recall * 100).toStringAsFixed(1)}%');
+                              return Text(
+                                  'Recall\n${(recall * 100).toStringAsFixed(1)}%');
                             case 3:
-                              return Text('F1 Score\n${(f1Score * 100).toStringAsFixed(1)}%');
+                              return Text(
+                                  'F1 Score\n${(f1Score * 100).toStringAsFixed(1)}%');
+                            case 4:
+                              return Text(
+                                  'Error Rate\n${(errorRate * 100).toStringAsFixed(1)}%');
                             default:
                               return Text('');
                           }
