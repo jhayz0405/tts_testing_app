@@ -118,11 +118,14 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
               onPressed: evaluateTTS,
               child: Text("Evaluate TTS"),
             ),
+            SizedBox(height: 35),
             Text("Transcribed Text: $transcribedText"),
+            SizedBox(height: 30),
             Text("Accuracy: $accuracy"),
             Text("Precision: $precision"),
             Text("Recall: $recall"),
             Text("F1 Score: $f1Score"),
+            Text("Error Score: $errorRate"),
             SizedBox(height: 20),
             Expanded(
               child: BarChart(
@@ -161,7 +164,7 @@ class _TTSEvaluationScreenState extends State<TTSEvaluationScreen> {
                     BarChartGroupData(
                       x: 4,
                       barRods: [
-                        BarChartRodData(toY: errorRate, color: Colors.purple)
+                        BarChartRodData(toY: errorRate  , color: Colors.purple)
                       ],
                       // showingTooltipIndicators: [0],
                     ),
